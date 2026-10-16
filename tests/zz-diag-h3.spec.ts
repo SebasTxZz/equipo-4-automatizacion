@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 // TEMPORAL: compara variantes de H3 con --repeat-each. Se borra antes de entregar.
+// Simula una máquina lenta (CPU 8x más lenta) para dejar en evidencia la carrera con la hidratación de la página.
+test.beforeEach(async ({ page, context }) => {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 8 });
+});
+
 const lineaCuaderno = (page: import('@playwright/test').Page) =>
   page.getByRole('listitem').filter({ hasText: 'Cuaderno universitario' });
 
