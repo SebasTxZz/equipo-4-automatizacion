@@ -66,8 +66,11 @@ test.describe('US-15 · Ingresar un correo electrónico válido', () => {
   // Una prueba por correo: el reporte dice exactamente qué filas fallan. `bug` con clave = fallo esperado de esa fila.
   const FILAS_VALIDAS = CORREOS_VALIDOS.map((correo) => ({
     correo,
-    // TE-96: la validación rechaza puntos en el nombre y dominios compuestos.
-    bug: correo === 'ana.gomez@gmail.com' || correo === 'ana@universidad.edu.co' ? BUG.CORREO_VALIDO_RECHAZADO : '',
+    // TE-96: la validación rechaza correos válidos con punto, guion o "+" en el nombre y dominios compuestos (.edu.co).
+    // Comprobado en la suite: fallan 4 de las 6 filas; solo pasan juan@correo.com y ana_gomez@gmail.com.
+    bug: ['ana.gomez@gmail.com', 'ana-gomez@gmail.com', 'ana+tienda@gmail.com', 'ana@universidad.edu.co'].includes(correo)
+      ? BUG.CORREO_VALIDO_RECHAZADO
+      : '',
   }));
   for (const { correo, bug } of FILAS_VALIDAS) {
     test(`CA1-CA3: el correo válido "${correo}" se acepta`, async ({ page }) => {

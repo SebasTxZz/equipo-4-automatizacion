@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { BUG } from './bugs';
 
 /**
  * PRUEBAS HEREDADAS (Parte 4).
@@ -14,12 +15,18 @@ import { test, expect } from '@playwright/test';
  * No las "arreglen" a ciegas: un rojo no siempre es un bug.
  */
 
-test('H1 · el catálogo tiene 6 productos', async ({ page }) => {
+// VEREDICTO H1 = DEFECTO DE LA PRUEBA: el dato esperado (6) estaba desactualizado. El criterio US-01 · CA1 dice 8
+// productos y la tienda muestra 8 (Expected 6 / Received 8). Se corrige la prueba, no la tienda.
+test('H1 · el catálogo tiene 8 productos', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(6);
+  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(8);
 });
 
+// VEREDICTO H2 = BUG DEL PRODUCTO (TE-92): 2 mochilas = $ 130.000; DESC20 descuenta $ 26.000; el IVA correcto es el 19% de
+// $ 104.000 = $ 19.760. La tienda muestra $ 24.700 (= 19% de $ 130.000, sin descontar). La prueba afirma lo correcto
+// y falla siempre igual, así que queda como fallo esperado enlazado a Jira.
 test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
+  test.fail(true, `${BUG.IVA_CON_DESCUENTO} · el IVA no se calcula sobre el valor descontado (muestra $ 24.700)`);
   await page.goto('/');
   const tarjeta = page
     .locator('.rounded-lg')
