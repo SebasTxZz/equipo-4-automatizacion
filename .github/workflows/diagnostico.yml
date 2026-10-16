@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        archivo: [02-carrito, 03-descuentos-iva, 04-checkout, 05-confirmacion, heredados]
+        archivo: [04-checkout, heredados, zz-diag-h3]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -25,4 +25,4 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Ejecutar ${{ matrix.archivo }}
-        run: npx playwright test ${{ matrix.archivo }} --retries=0 --reporter=github,list
+        run: npx playwright test ${{ matrix.archivo }} --retries=0 --reporter=github,list ${{ matrix.archivo == 'zz-diag-h3' && '--repeat-each=30' || '' }}
