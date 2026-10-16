@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { TiendaPage } from '../pages/TiendaPage';
 import { cop } from './helpers';
+import { BUG } from './bugs';
 
 /**
  * BLOQUE DESCUENTOS E IMPUESTOS · US-09 a US-12.
@@ -21,8 +22,8 @@ test.describe('US-09 · Aplicar un código de descuento', () => {
   // Prueba dirigida por datos: una prueba por variante, así el reporte dice EXACTAMENTE cuáles fallan.
   // `bug` vacío = la variante funciona hoy; con clave de Jira = fallo esperado documentado.
   const VARIANTES: { codigo: string; bug: string }[] = [
-    { codigo: 'desc10', bug: '' },
-    { codigo: 'Desc10', bug: '' },
+    { codigo: 'desc10', bug: BUG.CODIGO_SENSIBLE_A_MAYUSCULAS },
+    { codigo: 'Desc10', bug: BUG.CODIGO_SENSIBLE_A_MAYUSCULAS },
     { codigo: ' DESC10 ', bug: '' },
   ];
   for (const { codigo, bug } of VARIANTES) {
@@ -52,6 +53,7 @@ test.describe('US-10 · Recibir aviso si el código no es válido', () => {
   });
 
   test('CA2: un código inválido NO borra un descuento válido ya aplicado', async ({ page }) => {
+    test.fail(true, `${BUG.CODIGO_INVALIDO_BORRA_DESCUENTO} · un código inválido borra el descuento válido ya aplicado`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');
@@ -72,6 +74,7 @@ const TOTAL_ESPERADO = SUBTOTAL - DESCUENTO + IVA_ESPERADO;
 
 test.describe('US-11 · Ver el IVA correcto', () => {
   test('CA2: con descuento, el IVA se calcula sobre el valor descontado', async ({ page }) => {
+    test.fail(true, `${BUG.IVA_CON_DESCUENTO} · el IVA no se recalcula sobre el subtotal ya descontado`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');
@@ -83,6 +86,7 @@ test.describe('US-11 · Ver el IVA correcto', () => {
 
 test.describe('US-12 · Ver el total a pagar correcto', () => {
   test('CA2: con descuento, el total es subtotal − descuento + IVA (IVA sobre lo descontado)', async ({ page }) => {
+    test.fail(true, `${BUG.IVA_CON_DESCUENTO} · el total se calcula con el IVA sobre el subtotal sin descontar`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');

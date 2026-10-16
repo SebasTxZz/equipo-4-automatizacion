@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { TiendaPage, DATOS_VALIDOS } from '../pages/TiendaPage';
+import { BUG } from './bugs';
 
 /**
  * BLOQUE CHECKOUT · US-13 a US-15.
@@ -22,6 +23,7 @@ const CORREOS_MAL_FORMADOS = ['ana.gmail.com', 'ana@', '@gmail.com', 'ana gomez@
 
 test.describe('US-13 · Ir a pagar desde el carrito', () => {
   test('CA3: con total cero o negativo no se puede ir a pagar', async ({ page }) => {
+    test.fail(true, `${BUG.PAGAR_CON_TOTAL_CERO} · la tienda no valida el total antes de permitir ir a pagar`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');
@@ -62,7 +64,11 @@ test.describe('US-14 · Completar mis datos de envío', () => {
 
 test.describe('US-15 · Ingresar un correo electrónico válido', () => {
   // Una prueba por correo: el reporte dice exactamente qué filas fallan. `bug` con clave = fallo esperado de esa fila.
-  const FILAS_VALIDAS = CORREOS_VALIDOS.map((correo) => ({ correo, bug: '' }));
+  const FILAS_VALIDAS = CORREOS_VALIDOS.map((correo) => ({
+    correo,
+    // TE-96: la validación rechaza puntos en el nombre y dominios compuestos.
+    bug: correo === 'ana.gomez@gmail.com' || correo === 'ana@universidad.edu.co' ? BUG.CORREO_VALIDO_RECHAZADO : '',
+  }));
   for (const { correo, bug } of FILAS_VALIDAS) {
     test(`CA1-CA3: el correo válido "${correo}" se acepta`, async ({ page }) => {
       test.fail(bug !== '', `${bug} · el correo válido "${correo}" se rechaza`);

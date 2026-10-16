@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { TiendaPage } from '../pages/TiendaPage';
+import { BUG } from './bugs';
 
 /**
  * BLOQUE CARRITO · US-04 a US-07.
@@ -47,6 +48,7 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
   });
 
   test('CA3: 4 + 4 mochilas supera el stock (6) y debe rechazarse', async ({ page }) => {
+    test.fail(true, `${BUG.STOCK_ACUMULADO} · 4 + 4 mochilas supera el stock (6): el carrito queda en 8`);
     // El criterio exige que el stock no se supere: la cantidad en el carrito se queda en 4.
     // Si la tienda avisa con un alert(), se acepta para que no bloquee la página.
     page.on('dialog', (dialogo) => dialogo.accept());
@@ -62,6 +64,7 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
 
 test.describe('US-05 · Aumentar la cantidad desde el carrito', () => {
   test('CA2: "+" no pasa del stock (6 mochilas)', async ({ page }) => {
+    test.fail(true, `${BUG.MAS_SUPERA_STOCK} · "+" sigue subiendo la cantidad aunque se alcance el stock`);
     page.on('dialog', (dialogo) => dialogo.accept());
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -76,6 +79,7 @@ test.describe('US-05 · Aumentar la cantidad desde el carrito', () => {
 test.describe('US-06 · Disminuir la cantidad desde el carrito', () => {
   // El criterio acepta dos salidas correctas (quedarse en 1 o eliminar el producto): se elige "quedarse en 1".
   test('CA2: con cantidad 1, "−" no la deja en 0 ni en negativo (se queda en 1)', async ({ page }) => {
+    test.fail(true, `${BUG.MENOS_BAJA_DE_UNO} · "−" permite llegar a 0 y a cantidades negativas`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar', 1);

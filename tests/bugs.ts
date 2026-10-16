@@ -1,17 +1,17 @@
 /**
- * Claves de Jira de los bugs del producto que detecta la suite.
- *
- * Se centralizan aquí para actualizarlas en un solo lugar cuando se conozca la clave real del issue
- * en el proyecto TE de Jira (ej. 'TE-12'). Mientras valga 'TE-??', el bug aún no está enlazado a su issue.
+ * Claves de Jira (proyecto TE) de los bugs del producto que detecta la suite.
+ * Se centralizan aquí para que cada `test.fail(...)` apunte a su issue y la clave se actualice en un solo lugar.
  */
 export const BUG = {
-  STOCK_ACUMULADO: 'TE-??', // US-04 CA3: 4 + 4 mochilas supera el stock
-  MAS_SUPERA_STOCK: 'TE-??', // US-05 CA2: "+" supera el stock
-  MENOS_BAJA_DE_UNO: 'TE-??', // US-06 CA2: "−" deja la cantidad en 0 o negativa
-  CODIGO_INVALIDO_BORRA_DESCUENTO: 'TE-??', // US-10 CA2
-  IVA_CON_DESCUENTO: 'TE-??', // US-11 CA2 / US-12 CA2
-  PAGAR_CON_TOTAL_CERO: 'TE-??', // US-13 CA3
-  CORREO_VALIDO_RECHAZADO: 'TE-??', // US-15 CA1-CA3
-  FORMULARIO_CONSERVA_DATOS: 'TE-??', // US-16 CA1
-  PEDIDO_REPETIDO_TRAS_RECARGAR: 'TE-??', // US-17 CA3
+  STOCK_ACUMULADO: 'TE-85', // US-04 CA3: permite superar el stock con un producto ya en el carrito
+  MAS_SUPERA_STOCK: 'TE-86', // US-05 CA2: "+" sigue subiendo aunque se alcance el stock
+  MENOS_BAJA_DE_UNO: 'TE-87', // US-06 CA2: "−" permite llegar a 0 y a negativos
+  CODIGO_SENSIBLE_A_MAYUSCULAS: 'TE-89', // US-09 CA3: el código distingue mayúsculas/minúsculas
+  CODIGO_INVALIDO_BORRA_DESCUENTO: 'TE-91', // US-10 CA2: un código inválido borra el descuento válido
+  IVA_CON_DESCUENTO: 'TE-92', // US-11 CA2 / US-12 CA2: IVA y total no se recalculan sobre lo descontado
+  PAGAR_CON_TOTAL_CERO: 'TE-93', // US-13 CA3: permite ir a pagar con total cero o negativo
+  CORREO_VALIDO_RECHAZADO: 'TE-96', // US-15 CA1-CA3: rechaza dominios compuestos y puntos en el nombre
+  FORMULARIO_CONSERVA_DATOS: 'TE-97', // US-16 CA1: el formulario conserva los datos de la compra anterior
+  PEDIDO_REPETIDO_TRAS_RECARGAR: 'TE-98', // US-17 CA3: el número de pedido se repite tras recargar
+  CAMPOS_SIN_ETIQUETA: 'TE-100', // a11y: los campos del envío no tienen etiqueta asociada (getByLabel no los halla)
 } as const;
