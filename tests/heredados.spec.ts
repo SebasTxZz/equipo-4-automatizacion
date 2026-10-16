@@ -15,13 +15,11 @@ import { test, expect } from '@playwright/test';
  */
 
 test('H1 · el catálogo tiene 6 productos', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 3 })).toHaveCount(6);
 });
 
 test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
   await page.goto('/');
   const tarjeta = page
     .locator('.rounded-lg')
@@ -34,7 +32,6 @@ test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
 });
 
 test('H3 · agregar un cuaderno justo después de cargar', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'Agregar' }).first().click();
   await expect(page.getByRole('listitem').filter({ hasText: 'Cuaderno universitario' })).toBeVisible();
