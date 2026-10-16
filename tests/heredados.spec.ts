@@ -38,8 +38,14 @@ test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
   await expect(page.locator('dt:text-is("IVA (19%)") + dd')).toHaveText('$ 19.760');
 });
 
+// VEREDICTO H3 = PRUEBA FRÁGIL (inestable en potencia, no reproducida): esperaba solo 'domcontentloaded' y hacía clic en
+// "Agregar" apenas se descargaba el HTML, sin comprobar que el catálogo estuviera listo; en una máquina lenta ese clic podría
+// llegar antes de que la página responda. En CI se repitió con --repeat-each=30 en 4 variantes, también con la CPU 8 veces
+// más lenta: 240 de 240 pasaron, así que NO se pudo reproducir el fallo. La pausa fija (waitForTimeout) se descartó: espera un
+// TIEMPO y no una CONDICIÓN. Se estabiliza esperando la condición real: que el catálogo ya esté pintado.
 test('H3 · agregar un cuaderno justo después de cargar', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 3 }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Agregar' }).first().click();
   await expect(page.getByRole('listitem').filter({ hasText: 'Cuaderno universitario' })).toBeVisible();
 });

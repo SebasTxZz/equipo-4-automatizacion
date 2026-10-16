@@ -19,7 +19,15 @@ const CORREOS_VALIDOS = [
   'ana+tienda@gmail.com',
   'ana@universidad.edu.co',
 ];
-const CORREOS_MAL_FORMADOS = ['ana.gmail.com', 'ana@', '@gmail.com', 'ana gomez@gmail.com', 'ana@@gmail.com', 'ana@gmail'];
+const CORREOS_MAL_FORMADOS = [
+  'ana.gmail.com',
+  'ana@',
+  '@gmail.com',
+  'ana gomez@gmail.com',
+  'ana@@gmail.com',
+  'ana@gmail',
+  'ana@gmail.c', // extensión de un solo carácter (CP-15.5 · TE-96: hoy se acepta)
+];
 
 test.describe('US-13 · Ir a pagar desde el carrito', () => {
   test('CA3: con total cero o negativo no se puede ir a pagar', async ({ page }) => {
@@ -89,6 +97,7 @@ test.describe('US-15 · Ingresar un correo electrónico válido', () => {
 
   for (const correo of CORREOS_MAL_FORMADOS) {
     test(`CA4: el correo mal formado "${correo}" se rechaza con un mensaje claro`, async ({ page }) => {
+      test.fail(correo === 'ana@gmail.c', `${BUG.CORREO_VALIDO_RECHAZADO} · la validación acepta extensiones de un solo carácter`);
       const tienda = new TiendaPage(page);
       await tienda.abrir();
       await tienda.agregar('Esfero azul');
@@ -101,4 +110,19 @@ test.describe('US-15 · Ingresar un correo electrónico válido', () => {
       await expect(tienda.pedidoConfirmado).toBeHidden();
     });
   }
+});
+
+test.describe('US-20 · Usar la tienda con lector de pantalla', () => {
+  test('CA1: los campos del formulario de envío se anuncian con su etiqueta', async ({ page }) => {
+    test.fail(true, `${BUG.CAMPOS_SIN_ETIQUETA} · las etiquetas no están asociadas a sus campos (getByLabel no los encuentra)`);
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Esfero azul');
+    await tienda.irAPagar();
+
+    // getByLabel solo encuentra un campo si su <label> está asociado (for/id o input dentro del label).
+    await expect(page.getByLabel('Nombre completo')).toBeVisible();
+    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
+    await expect(page.getByLabel('Dirección de entrega')).toBeVisible();
+  });
 });
