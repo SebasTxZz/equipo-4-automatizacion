@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { TiendaPage } from '../pages/TiendaPage';
+import { BUG } from './bugs';
 
 /**
  * BLOQUE CONFIRMACIÓN · US-16 a US-19.
@@ -9,6 +10,7 @@ import { TiendaPage } from '../pages/TiendaPage';
 
 test.describe('US-16 · Que mis datos no queden a la vista de otra persona', () => {
   test('CA1: tras confirmar y empezar otra compra, el formulario aparece vacío', async ({ page }) => {
+    test.fail(true, `${BUG.FORMULARIO_CONSERVA_DATOS} · el formulario conserva los datos de la compra anterior`);
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.comprar('Esfero azul');
@@ -48,6 +50,7 @@ test.describe('US-17 · Confirmar mi pedido', () => {
   });
 
   test('CA3: un pedido hecho después de recargar la página no repite un número anterior', async ({ page }) => {
+    test.fail(true, `${BUG.PEDIDO_REPETIDO_TRAS_RECARGAR} · el número de pedido se repite tras recargar`);
     // Predicción antes de ejecutar: FALLA. Si el contador de pedidos vive solo en memoria de la página, al recargar
     // vuelve a empezar y el segundo pedido repite el número del primero.
     const tienda = new TiendaPage(page);
