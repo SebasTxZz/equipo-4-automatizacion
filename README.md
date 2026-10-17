@@ -10,7 +10,7 @@ Suite de pruebas end-to-end con **Playwright + TypeScript** para la tienda en l�
 | **Plan de pruebas y bugs** | [Proyecto TE en Jira](https://amigo-team-dauluhlg.atlassian.net/jira/software/projects/TE/boards/67/backlog) |
 | **Reporte de la última ejecución en `main`** | https://sebastxzz.github.io/equipo-4-automatizacion/ |
 | **Entrega del laboratorio** | [`ENTREGA.md`](ENTREGA.md) (decisiones, bugs, diagnóstico, medidas y reflexión) |
-| **Equipo 4** | Simon Restrepo Aristizabal · Jhoan Palacio · Juan Cartagena · Sebastián |
+| **Equipo 4** | Simon Restrepo Aristizabal · Jhoan Sebastián Palacio · Juan Pablo Cartagena · |
 
 ## Qué cubre
 
