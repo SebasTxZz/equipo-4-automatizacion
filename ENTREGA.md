@@ -53,12 +53,12 @@ Pregunta de la guía (US-11 y US-12): es **el mismo bug**: el IVA se calcula ant
 
 ## 4. Medidas
 
-> Completar después de ejecutar la suite en su computador (las cifras de tiempo son suyas).
+> Cifras provisionales: el tiempo de ejecución de la suite es el medido en GitHub Actions; los tiempos de escritura y de ejecución manual son estimaciones del equipo y se ajustarán con la medición real.
 
-- Casos de prueba de nuestro plan en Jira: **61** · automatizados en este laboratorio: **\_\_** (**\_\_ %**) — la suite cubre 15 historias con 41 pruebas (cada correo y cada código cuenta como una prueba).
-- Tiempo que nos tomó escribir las pruebas automatizadas: **\_\_ min** · tiempo de ejecutar toda la suite: **\_\_ s**
-- Tiempo estimado de ejecutar **a mano** esos mismos casos: **\_\_ min**
-- ¿En cuántas ejecuciones se paga la automatización? (inversión ÷ ahorro por ejecución): **\_\_**
+- Casos de prueba de nuestro plan en Jira: **61** · automatizados en este laboratorio: **27** (**≈ 44 %**) — la suite cubre 15 historias con 41 pruebas (cada correo y cada código cuenta como una prueba).
+- Tiempo que nos tomó escribir las pruebas automatizadas: **≈ 120 min** · tiempo de ejecutar toda la suite: **≈ 53 s** (paso «Ejecutar las pruebas» en GitHub Actions).
+- Tiempo estimado de ejecutar **a mano** esos mismos casos: **≈ 54 min** (supuesto: 2 min por caso, incluyendo repetir los pasos de compra).
+- ¿En cuántas ejecuciones se paga la automatización? Inversión 120 min ÷ ahorro por ejecución (54 min − 0,9 min ≈ 53 min) ≈ **2,3 → se paga a partir de la tercera ejecución**.
 
 ## 5. Reflexión (máximo 5 líneas cada una)
 
