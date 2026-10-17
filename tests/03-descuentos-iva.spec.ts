@@ -8,7 +8,7 @@ import { TiendaPage, pesos } from '../pages/TiendaPage';
  */
 
 test.describe('US-09 · Aplicar un código de descuento', () => {
-  test('CA1: DESC10 descuenta el 10% del subtotal', async ({ page }) => {
+  test('CA1: DESC10 descuenta el 10% del subtotal', { tag: ['@US-09', '@caso-TE-45'] }, async ({ page }) => {
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');
@@ -21,7 +21,10 @@ test.describe('US-09 · Aplicar un código de descuento', () => {
   // Prueba dirigida por datos: una prueba por variante, así el reporte dice exactamente cuáles fallan.
   const VARIANTES = ['desc10', 'Desc10', ' DESC10 '];
   for (const codigo of VARIANTES) {
-    test(`CA3: el código "${codigo}" se reconoce igual que DESC10`, async ({ page }) => {
+    const conBug = codigo.trim() !== 'DESC10';
+    test(`CA3: el código "${codigo}" se reconoce igual que DESC10`, {
+      tag: ['@US-09', '@caso-TE-47', ...(conBug ? ['@bug', '@bug-TE-89'] : [])],
+    }, async ({ page }) => {
       // " DESC10 " (con espacios) sí funciona hoy porque la tienda hace trim(); las otras dos fallan por mayúsculas.
       test.fail(codigo.trim() !== 'DESC10', 'TE-89 · el código de descuento distingue mayúsculas de minúsculas');
       const tienda = new TiendaPage(page);
@@ -36,7 +39,7 @@ test.describe('US-09 · Aplicar un código de descuento', () => {
 });
 
 test.describe('US-10 · Recibir aviso si el código no es válido', () => {
-  test('CA1: un código inexistente muestra el aviso y el total no cambia', async ({ page }) => {
+  test('CA1: un código inexistente muestra el aviso y el total no cambia', { tag: ['@US-10', '@caso-TE-49'] }, async ({ page }) => {
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Mochila escolar');
@@ -47,7 +50,7 @@ test.describe('US-10 · Recibir aviso si el código no es válido', () => {
     await expect(tienda.total('Total')).toHaveText(pesos(77350));
   });
 
-  test('CA2: un código inválido NO borra un descuento válido ya aplicado', async ({ page }) => {
+  test('CA2: un código inválido NO borra un descuento válido ya aplicado', { tag: ['@US-10', '@caso-TE-50', '@bug', '@bug-TE-91'] }, async ({ page }) => {
     test.fail(true, 'TE-91 · aplicar un código inválido pone el descuento en 0%');
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -62,7 +65,7 @@ test.describe('US-10 · Recibir aviso si el código no es válido', () => {
 });
 
 test.describe('US-11 · Ver el IVA correcto', () => {
-  test('CA2: con descuento, el IVA se calcula sobre el valor descontado', async ({ page }) => {
+  test('CA2: con descuento, el IVA se calcula sobre el valor descontado', { tag: ['@US-11', '@caso-TE-53', '@bug', '@bug-TE-92'] }, async ({ page }) => {
     test.fail(true, 'TE-92 · el IVA se calcula sobre el subtotal bruto, no sobre el valor descontado');
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -77,7 +80,7 @@ test.describe('US-11 · Ver el IVA correcto', () => {
 });
 
 test.describe('US-12 · Ver el total a pagar correcto', () => {
-  test('CA2: con descuento, el total es subtotal − descuento + IVA (IVA sobre lo descontado)', async ({ page }) => {
+  test('CA2: con descuento, el total es subtotal − descuento + IVA (IVA sobre lo descontado)', { tag: ['@US-12', '@caso-TE-55', '@bug', '@bug-TE-92'] }, async ({ page }) => {
     test.fail(true, 'TE-92 · mismo defecto que US-11 CA2 (un solo bug en Jira, dos criterios afectados)');
     const tienda = new TiendaPage(page);
     await tienda.abrir();

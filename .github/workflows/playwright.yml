@@ -2,6 +2,7 @@ name: Pruebas automatizadas
 
 # Cada vez que hacen push (o abren un pull request), GitHub ejecuta la suite completa en una máquina limpia.
 # Si un test falla, el commit se marca con una X roja. También se puede lanzar a mano desde la pestaña Actions.
+# En la rama main, además, se publica el reporte HTML en GitHub Pages (ver el job "publicar-reporte").
 on:
   push:
   pull_request:
@@ -38,3 +39,29 @@ jobs:
           name: reporte-playwright
           path: playwright-report/
           retention-days: 14
+
+      # Solo en main: empaqueta el mismo reporte para publicarlo como página web.
+      - name: Preparar el reporte para GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        with:
+          path: playwright-report/
+
+  publicar-reporte:
+    name: Publicar reporte en GitHub Pages
+    needs: e2e
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    # Si GitHub Pages aún no está activado en el repositorio (Settings → Pages → Source: GitHub Actions),
+    # este job falla sin poner en rojo la suite. Al activarlo, el reporte se publica solo.
+    continue-on-error: true
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4

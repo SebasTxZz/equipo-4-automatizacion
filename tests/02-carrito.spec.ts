@@ -13,7 +13,7 @@ import { TiendaPage } from '../pages/TiendaPage';
 
 test.describe('US-04 · Agregar productos sin superar el stock', () => {
   // ─────────────── EJEMPLO GUIADO (resuelto) ───────────────
-  test('CA1: se pueden agregar 15 cuadernos (stock 15)', async ({ page }) => {
+  test('CA1: se pueden agregar 15 cuadernos (stock 15)', { tag: ['@US-04', '@caso-TE-31'] }, async ({ page }) => {
     // ARRANGE: abrir la tienda
     await page.goto('/');
 
@@ -33,7 +33,7 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
   });
 
   // ─────────────── PENDIENTES ───────────────
-  test('CA2: no deja agregar 7 mochilas de una vez (stock 6) y avisa', async ({ page }) => {
+  test('CA2: no deja agregar 7 mochilas de una vez (stock 6) y avisa', { tag: ['@US-04', '@caso-TE-32'] }, async ({ page }) => {
     const tienda = new TiendaPage(page);
     await tienda.abrir();
 
@@ -48,7 +48,7 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
     await expect(page.getByText('Tu carrito está vacío.')).toBeVisible();
   });
 
-  test('CA3: 4 + 4 mochilas supera el stock (6) y debe rechazarse', async ({ page }) => {
+  test('CA3: 4 + 4 mochilas supera el stock (6) y debe rechazarse', { tag: ['@US-04', '@caso-TE-33', '@bug', '@bug-TE-85'] }, async ({ page }) => {
     test.fail(true, 'TE-85 · agregar 4 + 4 supera el stock: solo se valida la cantidad nueva, no la acumulada');
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -63,7 +63,7 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
 });
 
 test.describe('US-05 · Aumentar la cantidad desde el carrito', () => {
-  test('CA2: "+" no pasa del stock (6 mochilas)', async ({ page }) => {
+  test('CA2: "+" no pasa del stock (6 mochilas)', { tag: ['@US-05', '@caso-TE-36', '@bug', '@bug-TE-86'] }, async ({ page }) => {
     test.fail(true, 'TE-86 · el botón "+" del carrito no compara contra el stock');
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -76,7 +76,7 @@ test.describe('US-05 · Aumentar la cantidad desde el carrito', () => {
 });
 
 test.describe('US-06 · Disminuir la cantidad desde el carrito', () => {
-  test('CA2: con cantidad 1, "−" no la deja en 0 ni en negativo (elegimos: se queda en 1)', async ({ page }) => {
+  test('CA2: con cantidad 1, "−" no la deja en 0 ni en negativo (elegimos: se queda en 1)', { tag: ['@US-06', '@caso-TE-38', '@bug', '@bug-TE-87'] }, async ({ page }) => {
     test.fail(true, 'TE-87 · el botón "−" no tiene piso: la cantidad llega a 0 y a negativos');
     const tienda = new TiendaPage(page);
     await tienda.abrir();
@@ -89,7 +89,7 @@ test.describe('US-06 · Disminuir la cantidad desde el carrito', () => {
 });
 
 test.describe('US-07 · Quitar un producto del carrito', () => {
-  test('CA2: quitar el único producto deja el carrito vacío y el total en $ 0', async ({ page }) => {
+  test('CA2: quitar el único producto deja el carrito vacío y el total en $ 0', { tag: ['@US-07', '@caso-TE-41'] }, async ({ page }) => {
     const tienda = new TiendaPage(page);
     await tienda.abrir();
     await tienda.agregar('Esfero azul', 1);

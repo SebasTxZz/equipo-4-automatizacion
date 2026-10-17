@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *   ASSERT  (Entonces) → comprobar el resultado
  */
 test.describe('US-01 · Ver el catálogo de productos', () => {
-  test('CA1: el catálogo muestra 8 productos', async ({ page }) => {
+  test('CA1: el catálogo muestra 8 productos', { tag: ['@US-01', '@caso-TE-22'] }, async ({ page }) => {
     // ARRANGE + ACT: abrir la tienda (baseURL está en playwright.config.ts)
     await page.goto('/');
 
@@ -18,7 +18,7 @@ test.describe('US-01 · Ver el catálogo de productos', () => {
     await expect(page.getByRole('heading', { level: 3 })).toHaveCount(8);
   });
 
-  test('CA2: la mochila escolar muestra su precio y su stock', async ({ page }) => {
+  test('CA2: la mochila escolar muestra su precio y su stock', { tag: ['@US-01', '@caso-TE-23'] }, async ({ page }) => {
     await page.goto('/');
 
     // Ubicar la TARJETA de un producto: el contenedor que tiene como encabezado el nombre del producto.
@@ -31,7 +31,7 @@ test.describe('US-01 · Ver el catálogo de productos', () => {
     await expect(tarjeta).toContainText('Stock: 6');
   });
 
-  test('CA3: los precios usan punto de miles y no tienen decimales', async ({ page }) => {
+  test('CA3: los precios usan punto de miles y no tienen decimales', { tag: ['@US-01', '@caso-TE-24'] }, async ({ page }) => {
     await page.goto('/');
 
     // Leer el texto de todos los precios y comprobar cada uno con una expresión regular.

@@ -17,14 +17,14 @@ import { TiendaPage } from '../pages/TiendaPage';
 
 // H1 · Veredicto: DEFECTO DE LA PRUEBA. El catálogo tiene 8 productos (US-01 CA1 lo exige y la tienda lo cumple);
 // la prueba heredada esperaba 6, un dato viejo. Se corrige la expectativa, no la tienda.
-test('H1 · el catálogo tiene 8 productos (corregida: antes esperaba 6)', async ({ page }) => {
+test('H1 · el catálogo tiene 8 productos (corregida: antes esperaba 6)', { tag: ['@heredada', '@US-01', '@caso-TE-22'] }, async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 3 })).toHaveCount(8);
 });
 
 // H2 · Veredicto: BUG DEL PRODUCTO (TE-92). 2 mochilas = $ 130.000; con DESC20 el neto es $ 104.000 y el IVA correcto
 // es $ 19.760. La tienda calcula el IVA sobre el subtotal bruto ($ 24.700). La prueba está bien: queda como fallo conocido.
-test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
+test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', { tag: ['@heredada', '@US-11', '@bug', '@bug-TE-92'] }, async ({ page }) => {
   test.fail(true, 'TE-92 · el IVA se calcula sobre el subtotal bruto, no sobre el valor descontado');
   const tienda = new TiendaPage(page);
   await tienda.abrir();
@@ -37,7 +37,7 @@ test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
 // sin esperar a que el catálogo estuviera pintado, y asumía que el primer "Agregar" era el del cuaderno.
 // Se confirma con:  npx playwright test heredados -g H3 --repeat-each=10  (versión original en el historial de git).
 // Corrección: esperar el catálogo (tienda.abrir()) y apuntar a la tarjeta del cuaderno, no a "el primer botón".
-test('H3 · agregar un cuaderno justo después de cargar', async ({ page }) => {
+test('H3 · agregar un cuaderno justo después de cargar', { tag: ['@heredada'] }, async ({ page }) => {
   const tienda = new TiendaPage(page);
   await tienda.abrir();
   await tienda.agregar('Cuaderno universitario');

@@ -1,6 +1,6 @@
 # Entrega · Laboratorio 3.1 · Introducción a la automatización de pruebas
 
-**Equipo:** `equipo-1` · **Integrantes:** Simon Restrepo Aristizabal, Jhoan Palacio, Juan Cartagena, Sebastián · **Repositorio:** https://github.com/SebasTxZz/equipo-4-automatizacion
+**Equipo:** `equipo-4` · **Integrantes:** Simon Restrepo Aristizabal, Jhoan Palacio, Juan Cartagena, Sebastián · **Repositorio:** https://github.com/SebasTxZz/equipo-4-automatizacion
 
 > Plan de pruebas y bugs en Jira (proyecto TIENDA ESCOLAR, clave TE): https://amigo-team-dauluhlg.atlassian.net/browse/TE
 
@@ -49,7 +49,7 @@ Pregunta de la guía (US-11 y US-12): es **el mismo bug**: el IVA se calcula ant
 |---|---|---|---|
 | H1 · el catálogo tiene 6 productos | **Prueba** (defecto de la prueba) | El catálogo muestra 8 productos, igual que exige US-01 CA1 y comprueba `01-catalogo`. La expectativa de 6 era un dato viejo. | Corregimos la expectativa a 8. |
 | H2 · el IVA de 2 mochilas con DESC20… | **Producto** (bug TE-92) | A mano: 2 × $ 65.000 = $ 130.000; − 20 % = $ 104.000; IVA 19 % = $ 19.760 (lo que espera la prueba). La tienda muestra $ 24.700 (19 % del subtotal bruto). | Dejamos la prueba como está y la marcamos `test.fail('TE-92 · …')`. |
-| H3 · agregar un cuaderno justo después de cargar | **Inestable** (sincronización de la prueba) — _confirmar con `npx playwright test heredados -g H3 --repeat-each=10` sobre la versión original (`git log -p tests/heredados.spec.ts`)_ | La prueba original hacía clic con `waitUntil: 'domcontentloaded'` sin esperar el catálogo y apuntaba al “primer Agregar”, no a la tarjeta del cuaderno. | Esperamos el catálogo (`tienda.abrir()`) y usamos la tarjeta del cuaderno. |
+| H3 · agregar un cuaderno justo después de cargar | **Frágil / inestable en potencia (no reproducida)** | La prueba original hacía clic con `waitUntil: 'domcontentloaded'` sin esperar el catálogo y apuntaba al «primer Agregar». Se repitió 30 veces en CI cuatro variantes (original, con pausa de 300 ms, esperando el catálogo y esperando `networkidle`), también con la CPU 8 veces más lenta: 240 de 240 pasaron, así que **no se pudo reproducir el fallo**. | Esperamos el catálogo (`tienda.abrir()`) y usamos la tarjeta del cuaderno; se descartó `waitForTimeout` porque espera un tiempo y no una condición. |
 
 ## 4. Medidas
 
