@@ -52,16 +52,29 @@ jobs:
     needs: e2e
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
-    # Si GitHub Pages aún no está activado en el repositorio (Settings → Pages → Source: GitHub Actions),
-    # este job falla sin poner en rojo la suite. Al activarlo, el reporte se publica solo.
-    continue-on-error: true
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Si GitHub Pages aún no está activado (Settings → Pages → Source: GitHub Actions), no hay dónde publicar:
+      # el job termina en verde sin hacer nada. Al activarlo, el siguiente push a main publica el reporte.
+      - name: Comprobar si GitHub Pages está activado
+        id: estado
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" --silent 2>/dev/null; then
+            echo "habilitado=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "habilitado=false" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages no está activado: se omite la publicación del reporte."
+          fi
+
       - name: Publicar
         id: deployment
+        if: ${{ steps.estado.outputs.habilitado == 'true' }}
         uses: actions/deploy-pages@v4
