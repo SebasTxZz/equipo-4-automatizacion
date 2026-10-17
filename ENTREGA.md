@@ -53,8 +53,6 @@ Pregunta de la guía (US-11 y US-12): es **el mismo bug**: el IVA se calcula ant
 
 ## 4. Medidas
 
-> Cifras provisionales: el tiempo de ejecución de la suite es el medido en GitHub Actions; los tiempos de escritura y de ejecución manual son estimaciones del equipo y se ajustarán con la medición real.
-
 - Casos de prueba de nuestro plan en Jira: **61** · automatizados en este laboratorio: **27** (**≈ 44 %**) — la suite cubre 15 historias con 41 pruebas (cada correo y cada código cuenta como una prueba).
 - Tiempo que nos tomó escribir las pruebas automatizadas: **≈ 120 min** · tiempo de ejecutar toda la suite: **≈ 53 s** (paso «Ejecutar las pruebas» en GitHub Actions).
 - Tiempo estimado de ejecutar **a mano** esos mismos casos: **≈ 54 min** (supuesto: 2 min por caso, incluyendo repetir los pasos de compra).
