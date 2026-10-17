@@ -1,0 +1,42 @@
+name: Evidencias de bugs (capturas del reporte)
+
+# Genera una captura del reporte de Playwright por cada bug de Jira y la guarda en la carpeta evidencias/ de esta rama.
+# Se ejecuta solo en la rama evidencias-bugs o a mano; no afecta a main.
+on:
+  push:
+    branches: [evidencias-bugs]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capturas:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar la suite con captura en cada prueba
+        run: EVIDENCIAS=1 npx playwright test --retries=0
+
+      - name: Servir el reporte y tomar las capturas
+        run: |
+          npx playwright show-report playwright-report --host 127.0.0.1 --port 9323 > /tmp/reporte.log 2>&1 &
+          sleep 5
+          node scripts/capturas-reporte.mjs
+
+      - name: Guardar las capturas en la rama
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f evidencias/*.png
+          git commit -m "Evidencias: capturas del reporte por bug" || echo "Sin cambios"
+          git push origin HEAD:refs/heads/evidencias-bugs
