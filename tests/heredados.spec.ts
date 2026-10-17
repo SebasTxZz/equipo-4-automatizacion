@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { TiendaPage } from '../pages/TiendaPage';
 
 /**
  * PRUEBAS HEREDADAS (Parte 4).
@@ -14,28 +15,31 @@ import { test, expect } from '@playwright/test';
  * No las "arreglen" a ciegas: un rojo no siempre es un bug.
  */
 
-test('H1 · el catálogo tiene 6 productos', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
+// H1 · Veredicto: DEFECTO DE LA PRUEBA. El catálogo tiene 8 productos (US-01 CA1 lo exige y la tienda lo cumple);
+// la prueba heredada esperaba 6, un dato viejo. Se corrige la expectativa, no la tienda.
+test('H1 · el catálogo tiene 8 productos (corregida: antes esperaba 6)', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(6);
+  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(8);
 });
 
+// H2 · Veredicto: BUG DEL PRODUCTO (TE-92). 2 mochilas = $ 130.000; con DESC20 el neto es $ 104.000 y el IVA correcto
+// es $ 19.760. La tienda calcula el IVA sobre el subtotal bruto ($ 24.700). La prueba está bien: queda como fallo conocido.
 test('H2 · el IVA de 2 mochilas con DESC20 es $ 19.760', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
-  await page.goto('/');
-  const tarjeta = page
-    .locator('.rounded-lg')
-    .filter({ has: page.getByRole('heading', { name: 'Mochila escolar', level: 3 }) });
-  await tarjeta.getByRole('spinbutton').fill('2');
-  await tarjeta.getByRole('button', { name: 'Agregar' }).click();
-  await page.getByPlaceholder('Código de descuento').fill('DESC20');
-  await page.getByRole('button', { name: 'Aplicar' }).click();
-  await expect(page.locator('dt:text-is("IVA (19%)") + dd')).toHaveText('$ 19.760');
+  test.fail(true, 'TE-92 · el IVA se calcula sobre el subtotal bruto, no sobre el valor descontado');
+  const tienda = new TiendaPage(page);
+  await tienda.abrir();
+  await tienda.agregar('Mochila escolar', 2);
+  await tienda.aplicarCodigo('DESC20');
+  await expect(tienda.total('IVA')).toHaveText('$ 19.760');
 });
 
+// H3 · Veredicto: DEFECTO DE SINCRONIZACIÓN DE LA PRUEBA (inestable). Hacía clic con waitUntil:'domcontentloaded',
+// sin esperar a que el catálogo estuviera pintado, y asumía que el primer "Agregar" era el del cuaderno.
+// Se confirma con:  npx playwright test heredados -g H3 --repeat-each=10  (versión original en el historial de git).
+// Corrección: esperar el catálogo (tienda.abrir()) y apuntar a la tarjeta del cuaderno, no a "el primer botón".
 test('H3 · agregar un cuaderno justo después de cargar', async ({ page }) => {
-  test.fixme(true, 'En cuarentena: nadie sabe por qué falla'); // ← borren esta línea para ejecutarla
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByRole('button', { name: 'Agregar' }).first().click();
-  await expect(page.getByRole('listitem').filter({ hasText: 'Cuaderno universitario' })).toBeVisible();
+  const tienda = new TiendaPage(page);
+  await tienda.abrir();
+  await tienda.agregar('Cuaderno universitario');
+  await expect(tienda.linea('Cuaderno universitario')).toBeVisible();
 });

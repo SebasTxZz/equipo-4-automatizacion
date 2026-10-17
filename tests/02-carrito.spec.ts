@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { TiendaPage } from '../pages/TiendaPage';
 
 /**
  * BLOQUE CARRITO · US-04 a US-07.
  *
  * Cómo se trabaja este archivo:
  *  - La primera prueba ya está resuelta (EJEMPLO GUIADO).
- *  - Las demás están "pendientes": traen un test.fixme(...) que las salta. Para activar una, escriban su cuerpo
- *    y BORREN esa línea. Las pistas están en los comentarios.
+ *  - Todas las pruebas están implementadas; los fallos conocidos del producto llevan test.fail(...) con su clave de Jira.
  *  - "Nivel" va de 1 (fácil) a 3 (reto). "CAZABUGS" = el criterio probablemente destapa un bug de la tienda.
  *  - Los localizadores de la tienda están en el "Mapa de la tienda" de la guía del laboratorio.
  */
@@ -34,47 +34,69 @@ test.describe('US-04 · Agregar productos sin superar el stock', () => {
 
   // ─────────────── PENDIENTES ───────────────
   test('CA2: no deja agregar 7 mochilas de una vez (stock 6) y avisa', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar'); // ← borren esta línea cuando la implementen
-    // Nivel 2.
-    // Pista: la tienda avisa con un alert() del navegador, que BLOQUEA la página hasta que se atiende.
-    //   Registren el manejador ANTES del clic:
-    //     page.once('dialog', async (dialogo) => { /* guardar dialogo.message() */ await dialogo.accept(); });
-    // Verifiquen (1) que el texto del aviso menciona "Solo hay 6 unidades" y (2) que el carrito sigue vacío.
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+
+    let aviso = '';
+    page.once('dialog', async (dialogo) => {
+      aviso = dialogo.message();
+      await dialogo.accept();
+    });
+    await tienda.agregar('Mochila escolar', 7);
+
+    expect(aviso).toContain('Solo hay 6 unidades');
+    await expect(page.getByText('Tu carrito está vacío.')).toBeVisible();
   });
 
   test('CA3: 4 + 4 mochilas supera el stock (6) y debe rechazarse', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2 · CAZABUGS.
-    // Agreguen 4 mochilas y luego otras 4. Afirmen lo que el CRITERIO exige (el stock no se supera: la cantidad
-    // en el carrito se queda en 4), no lo que la tienda hace hoy.
-    // Si la prueba sale roja: ¿bug del producto, defecto de la prueba o prueba inestable? (Parte 3 de la guía)
+    test.fail(true, 'TE-85 · agregar 4 + 4 supera el stock: solo se valida la cantidad nueva, no la acumulada');
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    page.on('dialog', (dialogo) => dialogo.accept());
+
+    await tienda.agregar('Mochila escolar', 4);
+    await tienda.agregar('Mochila escolar', 4);
+
+    // El criterio exige que el stock no se supere: la cantidad en el carrito se queda en 4.
+    await expect(tienda.cantidad('Mochila escolar')).toHaveText('4');
   });
 });
 
 test.describe('US-05 · Aumentar la cantidad desde el carrito', () => {
   test('CA2: "+" no pasa del stock (6 mochilas)', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2 · CAZABUGS.
-    // Agreguen las 6 mochilas del stock y presionen "+" en el carrito
-    // (botón con nombre accesible "Aumentar cantidad de Mochila escolar"). La cantidad debe seguir en 6.
+    test.fail(true, 'TE-86 · el botón "+" del carrito no compara contra el stock');
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Mochila escolar', 6);
+
+    await tienda.aumentar('Mochila escolar');
+
+    await expect(tienda.cantidad('Mochila escolar')).toHaveText('6');
   });
 });
 
 test.describe('US-06 · Disminuir la cantidad desde el carrito', () => {
-  test('CA2: con cantidad 1, "−" no la deja en 0 ni en negativo', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2 · CAZABUGS.
-    // Agreguen 1 mochila y presionen "−" (botón "Disminuir cantidad de Mochila escolar").
-    // El criterio acepta dos salidas correctas: que se quede en 1 o que el producto se elimine.
-    // Elijan una, afírmenla y escriban en el nombre de la prueba cuál eligieron.
+  test('CA2: con cantidad 1, "−" no la deja en 0 ni en negativo (elegimos: se queda en 1)', async ({ page }) => {
+    test.fail(true, 'TE-87 · el botón "−" no tiene piso: la cantidad llega a 0 y a negativos');
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Mochila escolar', 1);
+
+    await tienda.disminuir('Mochila escolar');
+
+    await expect(tienda.cantidad('Mochila escolar')).toHaveText('1');
   });
 });
 
 test.describe('US-07 · Quitar un producto del carrito', () => {
   test('CA2: quitar el único producto deja el carrito vacío y el total en $ 0', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 1.
-    // Agreguen un esfero, quítenlo con el botón "Eliminar Esfero azul" y comprueben el mensaje "Tu carrito está vacío."
-    // y que la fila "Total" del carrito muestre $ 0.
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Esfero azul', 1);
+
+    await tienda.eliminar('Esfero azul');
+
+    await expect(page.getByText('Tu carrito está vacío.')).toBeVisible();
+    await expect(tienda.total('Total')).toHaveText('$ 0');
   });
 });

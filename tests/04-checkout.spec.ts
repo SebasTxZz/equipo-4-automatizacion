@@ -1,16 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { TiendaPage } from '../pages/TiendaPage';
 
 /**
  * BLOQUE CHECKOUT · US-13 a US-15.
- *
- * IMPORTANTE: en el formulario de envío page.getByLabel('Nombre completo') NO encuentra el campo. Pruébenlo y
- * diagnostiquen por qué (inspeccionen el HTML). Mientras tanto, esto SÍ funciona:
- *     page.locator('label:text-is("Nombre completo") + input')
- * (la etiqueta va justo antes del campo). Los textos de las etiquetas son: "Nombre completo",
- * "Correo electrónico" y "Dirección de entrega".
+ * Nota: page.getByLabel('Nombre completo') no encuentra el campo (la etiqueta no está asociada con for/id al input),
+ * por eso el Page Object usa  label:text-is("...") + input.
  */
 
-// Datos listos para la prueba dirigida por datos (US-15). Escribir cada correo a mano invita al error.
 const CORREOS_VALIDOS = [
   'juan@correo.com',
   'ana_gomez@gmail.com',
@@ -21,43 +17,84 @@ const CORREOS_VALIDOS = [
 ];
 const CORREOS_MAL_FORMADOS = ['ana.gmail.com', 'ana@', '@gmail.com', 'ana gomez@gmail.com', 'ana@@gmail.com', 'ana@gmail'];
 
+// Correos válidos que la tienda rechaza hoy (su regex /^\w+@\w+\.\w+$/ no admite ".", "-", "+" ni dominios compuestos).
+const RECHAZADOS_POR_BUG = new Set([
+  'ana.gomez@gmail.com',
+  'ana-gomez@gmail.com',
+  'ana+tienda@gmail.com',
+  'ana@universidad.edu.co',
+]);
+
 test.describe('US-13 · Ir a pagar desde el carrito', () => {
   test('CA3: con total cero o negativo no se puede ir a pagar', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2 · CAZABUGS.
-    // Agreguen 1 mochila y presionen "−" para llevar la cantidad a 0. El botón "Ir a pagar" debe estar deshabilitado
-    // (toBeDisabled()). Ojo: esta prueba fallará por el mismo defecto de US-06 CA2, pero es OTRO criterio y OTRO bug:
-    // aunque se corrija el "−", la tienda seguiría sin validar el total antes de cobrar.
+    test.fail(true, 'TE-93 · la tienda solo valida que el carrito no esté vacío, nunca el valor del total');
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Mochila escolar');
+
+    await tienda.disminuir('Mochila escolar'); // 1 → 0 (por el defecto de US-06, llega a 0)
+
+    await expect(tienda.botonIrAPagar).toBeDisabled();
   });
 });
 
 test.describe('US-14 · Completar mis datos de envío', () => {
   test('CA1: con el formulario vacío hay un error por cada campo obligatorio', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 1.
-    // Agreguen un producto, "Ir a pagar", presionen "Confirmar pedido" sin llenar nada y comprueben los tres mensajes:
-    // "El nombre es obligatorio." · "El correo es obligatorio." · "La dirección es obligatoria."
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Esfero azul');
+    await tienda.irAPagar();
+
+    await tienda.confirmar();
+
+    await expect(page.getByText('El nombre es obligatorio.')).toBeVisible();
+    await expect(page.getByText('El correo es obligatorio.')).toBeVisible();
+    await expect(page.getByText('La dirección es obligatoria.')).toBeVisible();
   });
 
   test('CA2: un nombre y una dirección de solo espacios se rechazan como vacíos', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2. Llenen nombre y dirección con "   " (tres espacios) y un correo válido.
+    const tienda = new TiendaPage(page);
+    await tienda.abrir();
+    await tienda.agregar('Esfero azul');
+    await tienda.irAPagar();
+    await tienda.llenarDatos({ nombre: '   ', correo: 'ana@correo.com', direccion: '   ' });
+
+    await tienda.confirmar();
+
+    await expect(page.getByText('El nombre es obligatorio.')).toBeVisible();
+    await expect(page.getByText('La dirección es obligatoria.')).toBeVisible();
+    await expect(page.getByText('¡Pedido confirmado!')).toHaveCount(0);
   });
 });
 
 test.describe('US-15 · Ingresar un correo electrónico válido', () => {
-  test('CA1-CA3: cada correo válido se acepta', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 3 · CAZABUGS · PRUEBAS DIRIGIDAS POR DATOS.
-    // Generen UNA prueba por cada correo de CORREOS_VALIDOS. Para cada una: agregar un producto, ir a pagar, llenar
-    // nombre y dirección válidos + ese correo, confirmar y comprobar que aparece "¡Pedido confirmado!".
-    // Cuando terminen, miren el reporte: ¿cuántas filas fallan? ¿Qué tienen en común?
-    // Reto: marquen como fallo conocido SOLO las filas que fallan, no todas (pista: test.fail(condicion, 'razón')).
-  });
+  for (const correo of CORREOS_VALIDOS) {
+    test(`CA1-CA3: el correo válido "${correo}" se acepta`, async ({ page }) => {
+      test.fail(RECHAZADOS_POR_BUG.has(correo), 'TE-96 · la validación de correo rechaza puntos, guiones, "+" y dominios compuestos');
+      const tienda = new TiendaPage(page);
+      await tienda.abrir();
+      await tienda.agregar('Esfero azul');
+      await tienda.irAPagar();
+      await tienda.llenarDatos({ nombre: 'Ana Gómez', correo, direccion: 'Calle 10 # 20-30' });
 
-  test('CA4: cada correo mal formado se rechaza con un mensaje claro', async ({ page }) => {
-    test.fixme(true, 'Pendiente de automatizar');
-    // Nivel 2. Igual que la anterior, con CORREOS_MAL_FORMADOS. Debe verse "El correo no tiene un formato válido."
-    // y NO debe aparecer "¡Pedido confirmado!".
-  });
+      await tienda.confirmar();
+
+      await expect(page.getByText('¡Pedido confirmado!')).toBeVisible();
+    });
+  }
+
+  for (const correo of CORREOS_MAL_FORMADOS) {
+    test(`CA4: el correo mal formado "${correo}" se rechaza con mensaje claro`, async ({ page }) => {
+      const tienda = new TiendaPage(page);
+      await tienda.abrir();
+      await tienda.agregar('Esfero azul');
+      await tienda.irAPagar();
+      await tienda.llenarDatos({ nombre: 'Ana Gómez', correo, direccion: 'Calle 10 # 20-30' });
+
+      await tienda.confirmar();
+
+      await expect(page.getByText('El correo no tiene un formato válido.')).toBeVisible();
+      await expect(page.getByText('¡Pedido confirmado!')).toHaveCount(0);
+    });
+  }
 });
